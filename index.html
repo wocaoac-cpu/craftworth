@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Craftworth — what your handmade work is really worth</title>
+<meta name="description" content="A pricing calculator for handmade & craft sellers. See your true cost, a profitable retail & wholesale price, and the number most makers never check: what you're really earning per hour. 100% in your browser, nothing uploaded.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Crect%20width='24'%20height='24'%20rx='5'%20fill='%2314110d'/%3E%3Cpath%20d='M12.586%203.586A2%202%200%200%200%2011.172%203H5a2%202%200%200%200-2%202v6.172a2%202%200%200%200%20.586%201.414l7.704%207.704a2%202%200%200%200%202.83%200l6.17-6.17a2%202%200%200%200%200-2.83z'%20fill='%23e6915a'/%3E%3Ccircle%20cx='7.5'%20cy='7.5'%20r='1.5'%20fill='%2314110d'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#14110d; --bg2:#1b1610; --panel:#1f1a13; --panel2:#261f17;
+  --line:rgba(190,160,120,.12); --line2:rgba(190,160,120,.24);
+  --txt:#f0e9df; --dim:#a89a86; --dim2:#6b5f4e;
+  --clay:#e6915a; --clay2:#f0a86e; --clay-soft:rgba(230,145,90,.12); --clay-line:rgba(230,145,90,.36);
+  --gold:#e8b75a;
+  --bad:#f0655e; --bad-soft:rgba(240,101,94,.13); --bad-line:rgba(240,101,94,.4);
+  --warn:#f0a83c; --good:#5bc08a; --good-soft:rgba(91,192,138,.13);
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sans:'Inter','Noto Sans SC',-apple-system,sans-serif;
+  --disp:'Fraunces','Noto Sans SC',Georgia,serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+::selection{background:var(--clay);color:#1a1209}
+button{font-family:inherit;cursor:pointer}
+.bg-glow{position:fixed;top:-25vh;left:50%;transform:translateX(-50%);width:90vw;height:70vh;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 50% 60% at 50% 0%,rgba(230,145,90,.10),transparent 70%)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 26px;position:relative;z-index:1}
+
+header{position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);background:linear-gradient(to bottom,rgba(20,17,13,.93),rgba(20,17,13,.6));border-bottom:1px solid var(--line)}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:14px 26px;max-width:1120px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:11px;font-family:var(--mono);font-size:13px;letter-spacing:.12em;font-weight:700}
+.logo .mk{width:27px;height:27px;display:grid;place-items:center;border-radius:7px;background:var(--clay-soft);border:1px solid var(--clay-line)}
+.logo b{font-weight:700}
+.hd-r{display:flex;align-items:center;gap:14px}
+.lock{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;color:var(--good);letter-spacing:.03em}
+.lock i{width:6px;height:6px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good)}
+@media(max-width:640px){.lock span{display:none}}
+.langs{display:flex;gap:3px}
+.langs button{background:none;border:1px solid var(--line2);color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.08em;border-radius:20px;padding:4px 9px;transition:.16s}
+.langs button.on{border-color:var(--clay-line);color:var(--clay2);background:var(--clay-soft)}
+
+.hero{padding:54px 0 26px;text-align:center}
+.kicker{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--clay2);margin-bottom:18px;border:1px solid var(--clay-line);background:var(--clay-soft);border-radius:20px;padding:6px 14px}
+h1{font-family:var(--disp);font-weight:800;font-size:clamp(32px,5.2vw,56px);line-height:1.05;letter-spacing:-.01em;max-width:820px;margin:0 auto}
+h1 em{font-style:italic;color:var(--clay)}
+.lede{font-size:16px;color:var(--dim);line-height:1.7;max-width:600px;margin:18px auto 0}
+.lede b{color:var(--txt);font-weight:600}
+
+/* calculator layout */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:34px 0 20px;align-items:start}
+@media(max-width:860px){.calc{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+.panel.results{position:sticky;top:78px}
+@media(max-width:860px){.panel.results{position:static}}
+.ph{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;flex-wrap:wrap}
+.ph h2{font-family:var(--disp);font-weight:600;font-size:19px}
+.ph .sample{font-family:var(--mono);font-size:11px;color:var(--clay2);border:1px solid var(--clay-line);background:var(--clay-soft);border-radius:20px;padding:5px 11px;transition:.15s}
+.ph .sample:hover{background:var(--clay);color:#1a1209}
+
+.fieldset{margin-bottom:18px}
+.fieldset>.lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;margin-bottom:9px;display:block}
+.row{display:flex;gap:9px;align-items:center;margin-bottom:8px}
+.row input,.row select{background:var(--bg2);border:1px solid var(--line2);border-radius:8px;color:var(--txt);font-family:var(--sans);font-size:13.5px;padding:9px 11px;outline:none;width:100%;min-width:0}
+.row input:focus,.row select:focus{border-color:var(--clay-line)}
+.row input.mini{max-width:90px;font-family:var(--mono)}
+.row .x{flex:none;width:30px;height:34px;border:1px solid var(--line2);background:none;color:var(--dim2);border-radius:8px;font-size:15px;transition:.15s}
+.row .x:hover{color:var(--bad);border-color:var(--bad-line)}
+.matrow input:first-child{flex:1}
+.addmat{background:none;border:1px dashed var(--line2);color:var(--dim);border-radius:8px;font-size:12.5px;padding:8px 12px;width:100%;transition:.15s}
+.addmat:hover{border-color:var(--clay-line);color:var(--clay2)}
+.grid2f{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.f{display:flex;flex-direction:column;gap:5px}
+.f label{font-size:11px;color:var(--dim);font-family:var(--mono);letter-spacing:.04em}
+.f .suffix{position:relative}
+.f .suffix small{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:var(--dim2);font-size:11px;font-family:var(--mono);pointer-events:none}
+.preset-wages{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.preset-wages button{font-family:var(--mono);font-size:10px;color:var(--dim);border:1px solid var(--line2);background:none;border-radius:14px;padding:3px 8px;transition:.15s}
+.preset-wages button:hover{color:var(--clay2);border-color:var(--clay-line)}
+
+/* results */
+.verdict{border-radius:14px;padding:22px 22px;margin-bottom:18px;border:1px solid var(--line);background:var(--bg2);text-align:center;transition:.3s}
+.verdict.bad{background:linear-gradient(160deg,var(--bad-soft),var(--bg2) 60%);border-color:var(--bad-line)}
+.verdict.warn{background:linear-gradient(160deg,rgba(240,168,60,.12),var(--bg2) 60%);border-color:rgba(240,168,60,.36)}
+.verdict.good{background:linear-gradient(160deg,var(--good-soft),var(--bg2) 60%);border-color:rgba(91,192,138,.36)}
+.verdict .vtag{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;color:var(--dim);text-transform:uppercase}
+.verdict .vnum{font-family:var(--disp);font-weight:800;font-size:clamp(34px,6vw,52px);line-height:1.05;margin:6px 0 2px}
+.verdict.bad .vnum{color:var(--bad)}.verdict.warn .vnum{color:var(--warn)}.verdict.good .vnum{color:var(--good)}
+.verdict .vunit{font-size:14px;color:var(--dim);font-family:var(--mono)}
+.verdict .vmsg{font-size:13.5px;color:var(--txt);margin-top:11px;line-height:1.55}
+.verdict .vsmall{font-size:12px;color:var(--dim);margin-top:6px}
+
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:14px 15px}
+.stat .sl{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;margin-bottom:7px}
+.stat .sv{font-family:var(--disp);font-weight:700;font-size:23px;line-height:1}
+.stat .sv.clay{color:var(--clay2)}.stat .sv.good{color:var(--good)}.stat .sv.bad{color:var(--bad)}
+.stat .sf{font-size:11px;color:var(--dim2);margin-top:5px}
+
+.breakdown{border-top:1px solid var(--line);padding-top:14px}
+.brow{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;color:var(--dim)}
+.brow b{color:var(--txt);font-weight:500}
+.brow .bv{font-family:var(--mono);color:var(--txt)}
+.brow.tot{border-top:1px dashed var(--line2);margin-top:6px;padding-top:10px;font-size:14px}
+.brow.tot .bv{color:var(--clay2);font-weight:700}
+.barwrap{height:7px;background:var(--bg2);border-radius:5px;overflow:hidden;display:flex;margin:12px 0 4px}
+.barwrap span{height:100%}
+.barkey{display:flex;flex-wrap:wrap;gap:10px;font-size:10.5px;color:var(--dim);font-family:var(--mono)}
+.barkey i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-top:16px}
+.btn{border:1px solid var(--line2);background:var(--panel2);color:var(--txt);border-radius:9px;font-size:12.5px;font-weight:500;padding:9px 13px;transition:.15s}
+.btn:hover{border-color:var(--clay-line);color:var(--clay2)}
+
+footer{border-top:1px solid var(--line);padding:28px 0;text-align:center;color:var(--dim2);font-size:12.5px;line-height:1.8;margin-top:30px}
+footer b{color:var(--dim)}
+.disc{max-width:620px;margin:0 auto}
+</style>
+</head>
+<body>
+<div class="bg-glow"></div>
+
+<header>
+  <div class="hd">
+    <div class="logo">
+      <span class="mk"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M12.586 3.586A2 2 0 0 0 11.172 3H5a2 2 0 0 0-2 2v6.172a2 2 0 0 0 .586 1.414l7.704 7.704a2 2 0 0 0 2.83 0l6.17-6.17a2 2 0 0 0 0-2.83z" fill="#e6915a"/><circle cx="7.5" cy="7.5" r="1.5" fill="#14110d"/></svg></span>
+      <b>CRAFTWORTH</b>
+    </div>
+    <div class="hd-r">
+      <div class="lock"><i></i><span data-i="lock">100% local · nothing uploaded</span></div>
+      <div class="langs">
+        <button data-lang="en" class="on">EN</button>
+        <button data-lang="zh">中</button>
+        <button data-lang="uk">UA</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="kicker" data-i="kicker">HANDMADE PRICING · 100% IN YOUR BROWSER</span>
+    <h1 data-i="h1">You love making it. But <em>what</em> are you really earning per hour?</h1>
+    <p class="lede" data-i="lede">Most handmade sellers price too low and quietly work for less than minimum wage. Enter your costs and <b>Craftworth shows your real hourly wage</b> — plus a retail & wholesale price that actually pays you. Nothing leaves your browser.</p>
+  </section>
+
+  <section class="calc">
+    <!-- INPUTS -->
+    <div class="panel inputs">
+      <div class="ph">
+        <h2 data-i="in_title">Your product</h2>
+        <button class="sample" id="btnSample" data-i="sample">Try an example</button>
+      </div>
+
+      <div class="fieldset">
+        <span class="lbl" data-i="f_materials">Materials (per item)</span>
+        <div id="mats"></div>
+        <button class="addmat" id="addMat" data-i="add_mat">+ Add material</button>
+      </div>
+
+      <div class="fieldset">
+        <span class="lbl" data-i="f_labor">Your time</span>
+        <div class="grid2f">
+          <div class="f"><label data-i="l_hours">Hours per item</label><input type="number" id="laborHours" min="0" step="0.25" value="0.5"></div>
+          <div class="f"><label data-i="l_wage">Your hourly wage</label><div class="suffix"><input type="number" id="hourlyWage" min="0" step="1" value="30"><small id="cur1">$</small></div></div>
+        </div>
+        <div class="preset-wages" id="wagePresets"></div>
+      </div>
+
+      <div class="fieldset">
+        <span class="lbl" data-i="f_overhead">Overhead & packaging</span>
+        <div class="grid2f">
+          <div class="f"><label data-i="l_ohm">Monthly overhead</label><div class="suffix"><input type="number" id="overheadMonthly" min="0" step="1" value="200"><small id="cur2">$</small></div></div>
+          <div class="f"><label data-i="l_units">Items sold / month</label><input type="number" id="unitsPerMonth" min="0" step="1" value="100"></div>
+          <div class="f"><label data-i="l_pack">Packaging / item</label><div class="suffix"><input type="number" id="packaging" min="0" step="0.1" value="1"><small id="cur3">$</small></div></div>
+          <div class="f"><label data-i="l_min">Min wage (your area)</label><div class="suffix"><input type="number" id="minWage" min="0" step="0.5" value="15"><small id="cur4">$</small></div></div>
+        </div>
+      </div>
+
+      <div class="fieldset">
+        <span class="lbl" data-i="f_sell">Where & how you sell</span>
+        <div class="grid2f">
+          <div class="f"><label data-i="l_platform">Marketplace</label><select id="platform"></select></div>
+          <div class="f"><label data-i="l_currency">Currency</label><select id="currency"></select></div>
+          <div class="f"><label data-i="l_current">Your current price</label><div class="suffix"><input type="number" id="currentPrice" min="0" step="0.5" value="20"><small id="cur5">$</small></div></div>
+          <div class="f"><label data-i="l_margin">Target profit margin</label><div class="suffix"><input type="number" id="targetMarginPct" min="0" max="90" step="1" value="40"><small>%</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="panel results">
+      <div class="ph"><h2 data-i="out_title">What it's really worth</h2></div>
+      <div id="results"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p class="disc">
+      <b>Craftworth</b> · <span data-i="f1">Project 0032 · built by Claude on the Opportunity Radar</span><br>
+      <span data-i="disc">Estimates use public 2026 marketplace fees and your inputs. Everything runs in your browser — your numbers never leave this page.</span>
+    </p>
+  </footer>
+</main>
+
+<script type="module" src="app.js?v=1"></script>
+</body>
+</html>
